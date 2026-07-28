@@ -1,4 +1,4 @@
-﻿import { BrainCircuit } from "lucide-react";
+import { BrainCircuit } from "lucide-react";
 import type { TeamRole } from "../data/siteConfig";
 
 type RoleIconProps = {
@@ -6,6 +6,8 @@ type RoleIconProps = {
   size?: number;
   className?: string;
 };
+
+const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 export function RoleIcon({ role, size = 28, className }: RoleIconProps) {
   if (role === "coach") {
@@ -22,7 +24,7 @@ export function RoleIcon({ role, size = 28, className }: RoleIconProps) {
   return (
     <img
       className={`role-icon ${className ?? ""}`}
-      src={`/roles/${role}.svg`}
+      src={publicAsset(`roles/${role}.svg`)}
       width={size}
       height={size}
       alt=""

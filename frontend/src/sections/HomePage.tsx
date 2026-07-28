@@ -1,11 +1,13 @@
-﻿import { ArrowDown, ArrowRight, Trophy, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, Trophy, Users } from "lucide-react";
+
+const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 type HomePageProps = {
   onTeams: () => void;
 };
 
 const achievements = [
-  { value: "1°", label: "Community Cup", season: "Spring split" },
+  { value: "1st", label: "Community Cup", season: "Spring split" },
   { value: "18", label: "Serie vinte", season: "Ultima stagione" },
   { value: "72%", label: "Win rate", season: "Tornei ufficiali" },
 ];
@@ -15,8 +17,8 @@ export function HomePage({ onTeams }: HomePageProps) {
     <main className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
         <img
-          src="/assets/ryn-victory.png"
-          alt="Il team RYN celebra una vittoria sul palco"
+          src={publicAsset("og-placeholder.svg")}
+          alt="Banner RYN eSport Community"
         />
         <div className="home-hero-shade" />
         <div className="home-hero-content">
@@ -98,13 +100,13 @@ export function HomePage({ onTeams }: HomePageProps) {
         </div>
         <figure className="victory-feature">
           <img
-            src="/assets/ryn-victory.png"
-            alt="I giocatori RYN sollevano il trofeo dopo la finale"
+            src={publicAsset("og-placeholder.svg")}
+            alt="Banner RYN eSport Community"
           />
           <figcaption>
             <span>Highlight</span>
             <strong>Community Cup Champions</strong>
-            <small>Finale nazionale · Milano</small>
+            <small>Finale nazionale - Milano</small>
           </figcaption>
         </figure>
         <div className="achievement-row">
@@ -131,7 +133,7 @@ export function HomePage({ onTeams }: HomePageProps) {
       <footer className="home-footer">
         <strong>RYN</strong>
         <span>eSport Community</span>
-        <small>© 2026 RYN. Placeholder legale.</small>
+        <small>(c) 2026 RYN. Placeholder legale.</small>
       </footer>
     </main>
   );
