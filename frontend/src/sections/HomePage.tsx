@@ -17,8 +17,8 @@ export function HomePage({ onTeams }: HomePageProps) {
     <main className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
         <img
-          src={publicAsset("og-placeholder.svg")}
-          alt="Banner RYN eSport Community"
+          src={publicAsset("assets/ryn-victory.png")}
+          alt="Il team RYN celebra una vittoria sul palco"
         />
         <div className="home-hero-shade" />
         <div className="home-hero-content">
@@ -100,8 +100,8 @@ export function HomePage({ onTeams }: HomePageProps) {
         </div>
         <figure className="victory-feature">
           <img
-            src={publicAsset("og-placeholder.svg")}
-            alt="Banner RYN eSport Community"
+            src={publicAsset("assets/ryn-victory.png")}
+            alt="I giocatori RYN sollevano il trofeo dopo la finale"
           />
           <figcaption>
             <span>Highlight</span>
