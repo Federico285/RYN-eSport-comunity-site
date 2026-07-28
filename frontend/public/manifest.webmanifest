@@ -1,0 +1,15 @@
+{
+  "name": "RYN eSport Community",
+  "short_name": "RYN",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b12",
+  "theme_color": "#21e6c1",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    }
+  ]
+}

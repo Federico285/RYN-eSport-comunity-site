@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ryn-application-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-28",
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:5173",
+  },
+}
