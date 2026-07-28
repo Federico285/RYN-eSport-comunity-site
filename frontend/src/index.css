@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -104,6 +104,7 @@ button {
 }
 
 .team-selector {
+  --slice-slant: 90px;
   display: flex;
   height: calc(100dvh - 64px);
   overflow: hidden;
@@ -114,30 +115,9 @@ button {
   position: relative;
   min-width: 0;
   flex: 1 1 0;
-  margin: 0 0 0 -36px;
+  margin: 0 0 0 calc(var(--slice-slant) * -1);
   overflow: hidden;
   border: 0;
-  border-left: 2px solid color-mix(in srgb, var(--accent) 65%, white);
-  background: #12161d;
-  color: #fff;
-  cursor: pointer;
-  transform: skewX(-6deg);
-  transform-origin: center;
-  transition:
-    flex-grow 360ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    filter 240ms ease;
-}
-
-.team-slice::before,
-.team-slice::after {
-  position: absolute;
-  inset: -10%;
-  content: "";
-  pointer-events: none;
-  transform: skewX(6deg);
-}
-
-.team-slice::before {
   background:
     linear-gradient(
       150deg,
@@ -148,10 +128,47 @@ button {
       30deg,
       color-mix(in srgb, var(--secondary) 22%, transparent),
       transparent 46%
-    );
+    ),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, #12161d), #12161d 72%);
+  color: #fff;
+  cursor: pointer;
+  clip-path: polygon(
+    var(--slice-slant) 0,
+    100% 0,
+    calc(100% - var(--slice-slant)) 100%,
+    0 100%
+  );
+  transition:
+    flex-grow 360ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 240ms ease;
+}
+
+.team-slice::before,
+.team-slice::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.team-slice::before {
+  inset: 0;
+  z-index: 2;
+  background: color-mix(in srgb, var(--accent) 65%, white);
+  clip-path: polygon(
+    var(--slice-slant) 0,
+    calc(var(--slice-slant) + 2px) 0,
+    2px 100%,
+    0 100%
+  );
+}
+
+.team-slice:first-child::before {
+  clip-path: polygon(0 0, 2px 0, 2px 100%, 0 100%);
 }
 
 .team-slice::after {
+  inset: 0;
+  z-index: 1;
   opacity: 0.25;
   background-image: repeating-linear-gradient(
     90deg,
@@ -163,21 +180,53 @@ button {
 }
 
 .team-slice:first-child {
-  margin-left: -52px;
-  padding-left: 52px;
+  margin-left: 0;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    calc(100% - var(--slice-slant)) 100%,
+    0 100%
+  );
 }
 
 .team-slice:last-child {
-  margin-right: -52px;
-  padding-right: 52px;
+  margin-right: 0;
+  clip-path: polygon(
+    var(--slice-slant) 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
 }
 
 .team-slice-2 {
-  background: #0f1719;
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--accent) 42%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(
+      30deg,
+      color-mix(in srgb, var(--secondary) 22%, transparent),
+      transparent 46%
+    ),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, #0f1719), #0f1719 72%);
 }
 
 .team-slice-3 {
-  background: #181714;
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--accent) 42%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(
+      30deg,
+      color-mix(in srgb, var(--secondary) 22%, transparent),
+      transparent 46%
+    ),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, #181714), #181714 72%);
 }
 
 .team-slice:hover,
@@ -194,18 +243,24 @@ button {
 
 .team-slice-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   height: 100%;
   min-width: 260px;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 44px 14%;
+  padding: 44px calc(14% + 18px) 44px calc(14% + var(--slice-slant));
   text-align: left;
-  transform: skewX(6deg);
 }
 
+.team-slice:first-child .team-slice-content {
+  padding-left: 14%;
+}
+
+.team-slice:last-child .team-slice-content {
+  padding-right: 14%;
+}
 .team-index {
   position: absolute;
   top: 28px;
@@ -630,34 +685,61 @@ textarea {
   }
 
   .team-selector {
+    --slice-slant: 22px;
     height: calc(100dvh - 58px);
     flex-direction: column;
   }
 
   .team-slice {
-    width: calc(100% + 24px);
+    width: 100%;
     min-height: 0;
-    margin: -10px -12px 0;
-    border-top: 2px solid color-mix(in srgb, var(--accent) 65%, white);
-    border-left: 0;
-    transform: skewY(-2deg);
+    margin: calc(var(--slice-slant) * -1) 0 0;
+    clip-path: polygon(
+      0 var(--slice-slant),
+      100% 0,
+      100% calc(100% - var(--slice-slant)),
+      0 100%
+    );
   }
 
   .team-slice:first-child {
-    margin-top: -12px;
-    margin-left: -12px;
-    padding: 12px 0 0;
+    margin-top: 0;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - var(--slice-slant)),
+      0 100%
+    );
   }
 
   .team-slice:last-child {
-    margin-right: -12px;
-    padding-right: 0;
-    padding-bottom: 12px;
+    clip-path: polygon(
+      0 var(--slice-slant),
+      100% 0,
+      100% 100%,
+      0 100%
+    );
   }
 
-  .team-slice::before,
+  .team-slice::before {
+    top: var(--slice-slant);
+    right: -8%;
+    bottom: auto;
+    left: -8%;
+    width: auto;
+    height: 2px;
+    clip-path: none;
+    transform: rotate(-2deg);
+    transform-origin: center;
+  }
+
+  .team-slice:first-child::before {
+    top: 0;
+    left: -8%;
+  }
+
   .team-slice::after {
-    transform: skewY(2deg);
+    inset: 0;
   }
 
   .team-slice:hover,
@@ -668,7 +750,12 @@ textarea {
   .team-slice-content {
     min-width: 0;
     padding: 18px 42px;
-    transform: skewY(2deg);
+  }
+
+  .team-slice:first-child .team-slice-content,
+  .team-slice:last-child .team-slice-content {
+    padding-right: 42px;
+    padding-left: 42px;
   }
 
   .team-index {
@@ -693,7 +780,6 @@ textarea {
     margin-top: 10px;
     font-size: 0.62rem;
   }
-
   .roster-page {
     height: calc(100dvh - 58px);
     grid-template-rows: 62px minmax(0, 2fr) minmax(124px, 1fr);
