@@ -15,8 +15,18 @@ describe("Team recruitment flow", () => {
     window.location.hash = "#/";
   });
 
-  it("mostra i tre team nella schermata iniziale", () => {
+  it("mostra la home e apre la selezione dei team", async () => {
+    const user = userEvent.setup();
     render(<App />);
+
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: /competere insieme/i,
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /scopri i team/i }));
 
     expect(
       screen.getByRole("button", { name: /apri il roster ryn apex/i }),
@@ -27,10 +37,12 @@ describe("Team recruitment flow", () => {
     expect(
       screen.getByRole("button", { name: /apri il roster ryn pulse/i }),
     ).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/teams");
   });
 
   it("naviga al dettaglio condiviso del team", async () => {
     const user = userEvent.setup();
+    window.location.hash = "#/teams";
     render(<App />);
 
     await user.click(
@@ -48,11 +60,9 @@ describe("Team recruitment flow", () => {
 
   it("apre la candidatura con team e ruolo preselezionati", async () => {
     const user = userEvent.setup();
+    window.location.hash = "#/team/apex";
     render(<App />);
 
-    await user.click(
-      screen.getByRole("button", { name: /apri il roster ryn apex/i }),
-    );
     await user.click(screen.getByRole("button", { name: /^candidati$/i }));
 
     expect(
