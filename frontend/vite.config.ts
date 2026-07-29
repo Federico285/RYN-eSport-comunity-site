@@ -13,6 +13,11 @@ export default defineConfig(({ mode }) => {
           target: "http://localhost:8787",
           changeOrigin: true,
         },
+        "/drafts": {
+          target: "http://localhost:8787",
+          changeOrigin: true,
+          ws: true,
+        },
       },
     },
   };

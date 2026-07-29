@@ -1,6 +1,8 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { teams } from "./data/siteConfig";
 import { ApplicationModal } from "./sections/ApplicationModal";
+import { DraftCreatePage } from "./sections/DraftCreatePage";
+import { DraftRoomPage } from "./sections/DraftRoomPage";
 import { Header } from "./sections/Header";
 import { HomePage } from "./sections/HomePage";
 import { TeamDetail } from "./sections/TeamDetail";
@@ -26,16 +28,22 @@ function App() {
     [teamId],
   );
   const isTeamsPage = route === "#/teams";
+  const isDraftCreatePage = route === "#/draft";
+  const draftRoomMatch = route.match(
+    /^#\/draft\/([A-Za-z0-9_-]{8,32})\/([A-Za-z0-9_-]{24,128})$/,
+  );
+  const isDraftPage = isDraftCreatePage || Boolean(draftRoomMatch);
 
   const navigate = useCallback((hash: string) => {
     window.location.hash = hash;
-    setRoute(`#${hash}`);
+    setRoute("#" + hash);
   }, []);
 
   const navigateHome = useCallback(() => navigate("/"), [navigate]);
   const navigateTeams = useCallback(() => navigate("/teams"), [navigate]);
+  const navigateDraft = useCallback(() => navigate("/draft"), [navigate]);
   const navigateTeam = useCallback(
-    (nextTeamId: string) => navigate(`/team/${nextTeamId}`),
+    (nextTeamId: string) => navigate("/team/" + nextTeamId),
     [navigate],
   );
 
@@ -49,9 +57,23 @@ function App() {
   };
 
   return (
-    <div className={`site-shell ${!team && !isTeamsPage ? "is-home" : ""}`}>
-      <Header onHome={navigateHome} onTeams={navigateTeams} />
-      {team ? (
+    <div
+      className={
+        "site-shell " +
+        (!team && !isTeamsPage && !isDraftPage ? "is-home " : "") +
+        (isDraftPage ? "is-draft" : "")
+      }
+    >
+      <Header
+        onHome={navigateHome}
+        onTeams={navigateTeams}
+        onDraft={navigateDraft}
+      />
+      {draftRoomMatch ? (
+        <DraftRoomPage roomId={draftRoomMatch[1]} token={draftRoomMatch[2]} />
+      ) : isDraftCreatePage ? (
+        <DraftCreatePage />
+      ) : team ? (
         <TeamDetail
           team={team}
           onBack={navigateTeams}
@@ -61,7 +83,7 @@ function App() {
       ) : isTeamsPage ? (
         <TeamSelection onSelect={navigateTeam} />
       ) : (
-        <HomePage onTeams={navigateTeams} />
+        <HomePage onTeams={navigateTeams} onDraft={navigateDraft} />
       )}
       {positionId ? (
         <ApplicationModal

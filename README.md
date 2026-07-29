@@ -1,11 +1,11 @@
-﻿# RYN eSport Community Site
+# RYN eSport Community Site
 
 Sito statico React per una community gaming/e-sport, con form candidature protetto da Cloudflare Turnstile e inoltro sicuro a Discord tramite Cloudflare Worker.
 
 ## Architettura
 
 - `frontend/`: selettore roster e pagine team React + Vite + TypeScript strict. Il build produce file statici in `frontend/dist`, caricabili su Aruba Linux.
-- `worker/`: Cloudflare Worker separato con endpoint `POST /apply`, `GET /health` e `OPTIONS`. Contiene webhook Discord e Turnstile secret solo come secret server-side.
+- worker/: Cloudflare Worker con candidature e Draft Room. Ogni lobby live usa una Durable Object SQLite con WebSocket, timer e stato persistente.
 - `scripts/`: script amministrativo per generare un Discord Community Invite con `role_ids`.
 - `.github/workflows/deploy-aruba.yml`: workflow manuale/opzionale su `main` per build e upload FTPS del solo contenuto di `frontend/dist`.
 
@@ -41,6 +41,7 @@ Copia `frontend/.env.example` in `frontend/.env`:
 
 ```env
 VITE_APPLICATION_API_URL=
+VITE_DRAFT_API_URL=
 VITE_TURNSTILE_SITE_KEY=
 VITE_DISCORD_INVITE_URL=https://discord.gg/...
 ```
@@ -91,7 +92,9 @@ cd worker
 npx wrangler deploy
 ```
 
-Dopo il deploy, imposta `VITE_APPLICATION_API_URL` con l URL pubblico del Worker, senza slash finale.
+Dopo il deploy, imposta VITE_APPLICATION_API_URL con l URL pubblico del Worker, senza slash finale. La Draft Room usa lo stesso Worker; VITE_DRAFT_API_URL serve solo se vuoi pubblicarla su un servizio differente.
+
+Il primo deploy applica la migrazione v1 e crea il binding Durable Object DRAFT_ROOMS. Mantieni ALLOWED_ORIGINS aggiornato con il dominio pubblico del sito.
 
 ## Community Invite Discord con ruolo
 
@@ -223,3 +226,18 @@ I link `Privacy policy` e `Cookie policy` sono placeholder iniziali e vanno sost
 - [ ] Caricare solo `frontend/dist` su Aruba.
 - [ ] Verificare HTTPS e redirect `www`.
 - [ ] Configurare i secret GitHub Actions se usi deploy automatico.
+
+## RYN Draft Room
+
+La pagina #/draft crea una lobby pick/ban competitiva e genera quattro link separati:
+
+- capitano Team Blu;
+- capitano Team Rosso;
+- spettatore in sola lettura;
+- amministratore con pausa, ripristino, annullamento e reset.
+
+Le lobby usano la sequenza competitiva completa da 20 azioni, timer server-side, riconnessione automatica e scadenza dopo sette giorni. I token di accesso viaggiano nel frammento hash del link e nel Worker vengono conservati soltanto come hash SHA-256.
+
+Campioni e icone arrivano dal Data Dragon ufficiale Riot, utilizzando automaticamente l ultima versione disponibile e la localizzazione italiana.
+
+Per provarla in locale avvia npm run dev, apri http://localhost:5173/#/draft, crea una lobby e usa i link generati in finestre o browser differenti.

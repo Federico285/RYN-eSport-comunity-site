@@ -4,6 +4,7 @@ const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 type HomePageProps = {
   onTeams: () => void;
+  onDraft: () => void;
 };
 
 const achievements = [
@@ -12,7 +13,7 @@ const achievements = [
   { value: "72%", label: "Win rate", season: "Tornei ufficiali" },
 ];
 
-export function HomePage({ onTeams }: HomePageProps) {
+export function HomePage({ onTeams, onDraft }: HomePageProps) {
   return (
     <main className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
@@ -32,9 +33,9 @@ export function HomePage({ onTeams }: HomePageProps) {
             <button className="home-primary" type="button" onClick={onTeams}>
               Scopri i team <ArrowRight aria-hidden="true" size={19} />
             </button>
-            <a className="home-secondary" href="#chi-siamo">
-              Chi siamo <ArrowDown aria-hidden="true" size={18} />
-            </a>
+            <button className="home-secondary" type="button" onClick={onDraft}>
+              Apri draft tool <ArrowDown aria-hidden="true" size={18} />
+            </button>
           </div>
         </div>
         <span className="home-scroll-marker">Scroll to discover</span>

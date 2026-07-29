@@ -1,4 +1,4 @@
-﻿import { render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
@@ -83,5 +83,20 @@ describe("Team recruitment flow", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: /ryn nova/i }),
     ).toBeInTheDocument();
+  });
+
+  it("apre il draft tool dalla navigazione principale", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /^draft$/i }));
+
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: /la partita inizia prima della landa/i,
+      }),
+    ).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/draft");
   });
 });

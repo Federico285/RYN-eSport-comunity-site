@@ -1,4 +1,12 @@
 import { sendApplicationToDiscord } from "./discord";
+import {
+  createDraftSchema,
+  DraftRoom,
+  hashToken,
+  randomToken,
+  type DraftLobby,
+  type DraftRole,
+} from "./draft";
 import { verifyTurnstile } from "./turnstile";
 import type { ApiResponse, Env } from "./types";
 import { applicationSchema } from "./validation";
@@ -7,7 +15,7 @@ const MAX_BODY_BYTES = 24 * 1024;
 const localRateLimit = new Map<string, { count: number; resetAt: number }>();
 
 function json(
-  data: ApiResponse | { status: "ok" },
+  data: ApiResponse | { status: "ok" } | Record<string, unknown>,
   status: number,
   origin?: string,
 ): Response {
@@ -23,7 +31,7 @@ function json(
 function corsHeaders(origin: string): HeadersInit {
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     Vary: "Origin",
   };
@@ -77,6 +85,84 @@ async function parseJsonBody(
   }
 }
 
+async function createDraft(request: Request, env: Env, origin: string) {
+  if (await isRateLimited(request, env)) {
+    return json(
+      { success: false, error: "Troppe lobby create. Riprova tra poco." },
+      429,
+      origin,
+    );
+  }
+
+  if (!request.headers.get("Content-Type")?.includes("application/json")) {
+    return json({ success: false, error: "Richiesta non valida" }, 400, origin);
+  }
+
+  const body = await parseJsonBody(request);
+  if (body === "too-large") {
+    return json(
+      { success: false, error: "Richiesta troppo grande" },
+      413,
+      origin,
+    );
+  }
+  if (body === "invalid") {
+    return json({ success: false, error: "JSON non valido" }, 400, origin);
+  }
+
+  const parsed = createDraftSchema.safeParse(body);
+  if (!parsed.success) {
+    return json(
+      { success: false, error: "Controlla i dati della lobby" },
+      400,
+      origin,
+    );
+  }
+
+  const roomId = randomToken(9);
+  const roles: DraftRole[] = ["blue", "red", "spectator", "admin"];
+  const roleTokens = Object.fromEntries(
+    roles.map((role) => [role, randomToken()]),
+  ) as Record<DraftRole, string>;
+  const roleHashes = Object.fromEntries(
+    await Promise.all(
+      roles.map(
+        async (role) => [role, await hashToken(roleTokens[role])] as const,
+      ),
+    ),
+  ) as Record<DraftRole, string>;
+
+  const lobby: DraftLobby = {
+    roomId,
+    ...parsed.data,
+    status: "lobby",
+    ready: { blue: false, red: false },
+    actions: [],
+    deadline: null,
+    pausedReason: null,
+    version: 0,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    roleHashes,
+  };
+
+  const room = env.DRAFT_ROOMS.get(env.DRAFT_ROOMS.idFromName(roomId));
+  const initialized = await room.fetch("https://draft.internal/initialize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(lobby),
+  });
+  if (!initialized.ok) {
+    return json(
+      { success: false, error: "Impossibile creare la lobby" },
+      502,
+      origin,
+    );
+  }
+
+  return json({ success: true, roomId, tokens: roleTokens }, 201, origin);
+}
+
 function applicationId(): string {
   return crypto.randomUUID();
 }
@@ -96,6 +182,28 @@ export async function handleRequest(
 
   if (url.pathname === "/health" && request.method === "GET") {
     return json({ status: "ok" }, 200);
+  }
+
+  if (url.pathname === "/drafts" && request.method === "POST") {
+    const origin = getAllowedOrigin(request, env);
+    if (!origin) {
+      return json({ success: false, error: "Origine non autorizzata" }, 403);
+    }
+    return createDraft(request, env, origin);
+  }
+
+  const draftSocketMatch = url.pathname.match(
+    /^\/drafts\/([A-Za-z0-9_-]{8,32})\/socket$/,
+  );
+  if (draftSocketMatch && request.method === "GET") {
+    const origin = getAllowedOrigin(request, env);
+    if (!origin) {
+      return new Response("Origine non autorizzata", { status: 403 });
+    }
+    const room = env.DRAFT_ROOMS.get(
+      env.DRAFT_ROOMS.idFromName(draftSocketMatch[1]),
+    );
+    return room.fetch(new Request("https://draft.internal/socket", request));
   }
 
   if (url.pathname !== "/apply") {
@@ -185,3 +293,5 @@ export async function handleRequest(
 export default {
   fetch: handleRequest,
 };
+
+export { DraftRoom };

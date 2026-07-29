@@ -6,4 +6,18 @@
   "vars": {
     "ALLOWED_ORIGINS": "http://localhost:5173",
   },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "DRAFT_ROOMS",
+        "class_name": "DraftRoom",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DraftRoom"],
+    },
+  ],
 }
