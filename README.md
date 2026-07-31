@@ -195,7 +195,7 @@ Copertura inclusa:
 - Nessun segreto in variabili `VITE_*`.
 - Nessun dato personale in `localStorage`.
 - Nessun database.
-- Nessun log Worker con email, motivazione o curriculum.
+- Nessun log Worker con Riot ID, username Discord, motivazione o link OP.GG.
 - Honeypot, Turnstile, limiti body, CORS e rate limit restano attivi insieme.
 - Il rate limit locale serve solo per sviluppo. In produzione configura il binding Rate Limiting Cloudflare compatibile con l interfaccia `RATE_LIMITER`.
 

@@ -1,7 +1,6 @@
-﻿import type { ApplicationPayload } from "./validation";
+import type { ApplicationPayload } from "./validation";
 
 const MAX_FIELD = 1024;
-const MAX_TEXT = 3900;
 
 function neutralizeMentions(value: string): string {
   return value
@@ -36,8 +35,16 @@ export function buildDiscordPayload(
             value: truncate(application.positionId),
             inline: true,
           },
-          { name: "Nome", value: truncate(application.fullName), inline: true },
-          { name: "Email", value: truncate(application.email), inline: true },
+          {
+            name: "Riot ID",
+            value: truncate(application.riotId),
+            inline: true,
+          },
+          {
+            name: "Riot Tag",
+            value: truncate(application.riotTag),
+            inline: true,
+          },
           {
             name: "Discord",
             value: truncate(application.discordUsername),
@@ -55,22 +62,17 @@ export function buildDiscordPayload(
           },
           {
             name: "Esperienza",
-            value: truncate(application.experience, MAX_TEXT),
+            value: truncate(application.experience),
             inline: false,
           },
           {
             name: "Motivazione",
-            value: truncate(application.motivation, MAX_TEXT),
+            value: truncate(application.motivation),
             inline: false,
           },
           {
-            name: "Portfolio",
-            value: truncate(application.portfolioUrl),
-            inline: false,
-          },
-          {
-            name: "Curriculum",
-            value: truncate(application.cvUrl),
+            name: "OP.GG",
+            value: truncate(application.opggUrl),
             inline: false,
           },
         ],

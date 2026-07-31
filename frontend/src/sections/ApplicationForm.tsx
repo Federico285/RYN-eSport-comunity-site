@@ -16,18 +16,21 @@ type ApplicationFormProps = {
   selectedPositionId: string;
 };
 
+const availablePositions = openPositions.filter((position) => position.isOpen);
+const onlyOpenPosition =
+  availablePositions.length === 1 ? availablePositions[0] : undefined;
+
 const defaultValues: ApplicationFormValues = {
-  fullName: "",
-  email: "",
+  riotId: "",
+  riotTag: "",
   discordUsername: "",
-  positionId: "",
+  positionId: onlyOpenPosition?.id ?? "",
   age: siteConfig.minimumAge,
   confirmsMinimumAge: false,
+  weeklyAvailability: "",
   experience: "",
   motivation: "",
-  weeklyAvailability: "",
-  portfolioUrl: "",
-  cvUrl: "",
+  opggUrl: "",
   privacyConsent: false,
   website: "",
   turnstileToken: "",
@@ -40,6 +43,11 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
   }>();
   const statusRef = useRef<HTMLDivElement | null>(null);
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+  const selectedOpenPosition = availablePositions.find(
+    (position) => position.id === selectedPositionId,
+  );
+  const effectivePositionId =
+    selectedOpenPosition?.id ?? onlyOpenPosition?.id ?? "";
   const {
     register,
     handleSubmit,
@@ -71,10 +79,10 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
   });
 
   useEffect(() => {
-    if (selectedPositionId) {
-      setValue("positionId", selectedPositionId, { shouldValidate: true });
-    }
-  }, [selectedPositionId, setValue]);
+    setValue("positionId", effectivePositionId, {
+      shouldValidate: Boolean(effectivePositionId),
+    });
+  }, [effectivePositionId, setValue]);
 
   useEffect(() => {
     if (status) statusRef.current?.focus();
@@ -85,7 +93,7 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
     const result = await submitApplication(values);
 
     if (result.success) {
-      reset(defaultValues);
+      reset({ ...defaultValues, positionId: effectivePositionId });
       turnstile.reset();
       setStatus({
         type: "success",
@@ -135,33 +143,28 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
           ) : null}
 
           <div className="grid gap-5 md:grid-cols-2">
-            <Field
-              id="fullName"
-              label="Nome e cognome"
-              error={errors.fullName?.message}
-            >
+            <Field id="riotId" label="Riot ID" error={errors.riotId?.message}>
               <input
-                id="fullName"
-                autoComplete="name"
-                aria-invalid={Boolean(errors.fullName)}
-                aria-describedby={
-                  errors.fullName ? "fullName-error" : undefined
-                }
-                {...register("fullName")}
+                id="riotId"
+                autoComplete="off"
+                placeholder="Nome giocatore"
+                aria-invalid={Boolean(errors.riotId)}
+                aria-describedby={errors.riotId ? "riotId-error" : undefined}
+                {...register("riotId")}
               />
             </Field>
             <Field
-              id="email"
-              label="Indirizzo email"
-              error={errors.email?.message}
+              id="riotTag"
+              label="Riot Tag"
+              error={errors.riotTag?.message}
             >
               <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? "email-error" : undefined}
-                {...register("email")}
+                id="riotTag"
+                autoComplete="off"
+                placeholder="Es. EUW"
+                aria-invalid={Boolean(errors.riotTag)}
+                aria-describedby={errors.riotTag ? "riotTag-error" : undefined}
+                {...register("riotTag")}
               />
             </Field>
             <Field
@@ -179,29 +182,44 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
                 {...register("discordUsername")}
               />
             </Field>
-            <Field
-              id="positionId"
-              label="Posizione desiderata"
-              error={errors.positionId?.message}
-            >
-              <select
+            {availablePositions.length > 1 ? (
+              <Field
                 id="positionId"
-                aria-invalid={Boolean(errors.positionId)}
-                aria-describedby={
-                  errors.positionId ? "positionId-error" : undefined
-                }
-                {...register("positionId")}
+                label="Posizione desiderata"
+                error={errors.positionId?.message}
               >
-                <option value="">Seleziona</option>
-                {openPositions
-                  .filter((position) => position.isOpen)
-                  .map((position) => (
+                <select
+                  id="positionId"
+                  aria-invalid={Boolean(errors.positionId)}
+                  aria-describedby={
+                    errors.positionId ? "positionId-error" : undefined
+                  }
+                  {...register("positionId")}
+                >
+                  <option value="">Seleziona</option>
+                  {availablePositions.map((position) => (
                     <option key={position.id} value={position.id}>
                       {position.title}
                     </option>
                   ))}
-              </select>
-            </Field>
+                </select>
+              </Field>
+            ) : (
+              <Field
+                id="positionDisplay"
+                label="Posizione desiderata"
+                error={errors.positionId?.message}
+              >
+                <input
+                  id="positionDisplay"
+                  value={
+                    onlyOpenPosition?.title ?? "Nessuna posizione disponibile"
+                  }
+                  readOnly
+                />
+                <input type="hidden" {...register("positionId")} />
+              </Field>
+            )}
             <Field id="age" label="Eta" error={errors.age?.message}>
               <input
                 id="age"
@@ -263,33 +281,19 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
             </Field>
           </div>
 
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <div className="mt-5">
             <Field
-              id="portfolioUrl"
-              label="Portfolio o link utile, facoltativo"
-              error={errors.portfolioUrl?.message}
+              id="opggUrl"
+              label="Link OP.GG"
+              error={errors.opggUrl?.message}
             >
               <input
-                id="portfolioUrl"
+                id="opggUrl"
                 type="url"
-                aria-invalid={Boolean(errors.portfolioUrl)}
-                aria-describedby={
-                  errors.portfolioUrl ? "portfolioUrl-error" : undefined
-                }
-                {...register("portfolioUrl")}
-              />
-            </Field>
-            <Field
-              id="cvUrl"
-              label="URL del curriculum, facoltativo"
-              error={errors.cvUrl?.message}
-            >
-              <input
-                id="cvUrl"
-                type="url"
-                aria-invalid={Boolean(errors.cvUrl)}
-                aria-describedby={errors.cvUrl ? "cvUrl-error" : undefined}
-                {...register("cvUrl")}
+                placeholder="https://www.op.gg/summoners/..."
+                aria-invalid={Boolean(errors.opggUrl)}
+                aria-describedby={errors.opggUrl ? "opggUrl-error" : undefined}
+                {...register("opggUrl")}
               />
             </Field>
           </div>

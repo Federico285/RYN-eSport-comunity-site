@@ -11,9 +11,9 @@ const env: Env = {
 };
 
 const validPayload = {
-  fullName: "Mario Rossi",
-  email: "mario@example.com",
-  discordUsername: "mario#1234",
+  riotId: "MarioRossi",
+  riotTag: "EUW",
+  discordUsername: "mariorossi",
   positionId: "community-moderator",
   age: 21,
   confirmsMinimumAge: true,
@@ -22,8 +22,7 @@ const validPayload = {
   motivation:
     "Vorrei aiutare RYN a crescere con eventi ordinati e una community accogliente.",
   weeklyAvailability: "Tre sere a settimana",
-  portfolioUrl: "https://example.com/portfolio",
-  cvUrl: "",
+  opggUrl: "https://www.op.gg/summoners/euw/MarioRossi-EUW",
   privacyConsent: true,
   website: "",
   turnstileToken: "token",
@@ -86,8 +85,26 @@ describe("worker /apply", () => {
   it("rifiuta campo obbligatorio mancante", async () => {
     mockExternal();
     const payload = { ...validPayload };
-    delete (payload as Partial<typeof validPayload>).email;
+    delete (payload as Partial<typeof validPayload>).riotId;
     const response = await handleRequest(request(payload), env);
+    expect(response.status).toBe(400);
+  });
+
+  it("accetta esperienza e motivazione vuote", async () => {
+    mockExternal();
+    const response = await handleRequest(
+      request({ ...validPayload, experience: "", motivation: "" }),
+      env,
+    );
+    expect(response.status).toBe(200);
+  });
+
+  it("rifiuta un link esterno a OP.GG", async () => {
+    mockExternal();
+    const response = await handleRequest(
+      request({ ...validPayload, opggUrl: "https://example.com/player" }),
+      env,
+    );
     expect(response.status).toBe(400);
   });
 

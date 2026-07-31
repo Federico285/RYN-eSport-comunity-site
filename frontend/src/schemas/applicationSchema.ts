@@ -1,28 +1,24 @@
 import { z } from "zod";
 import { siteConfig } from "../data/siteConfig";
 
-const optionalUrl = z
+const opggUrl = z
   .string()
   .trim()
-  .optional()
-  .or(z.literal(""))
-  .refine(
-    (value) => !value || /^https?:\/\/.+\..+/.test(value),
-    "Inserisci un URL valido",
-  );
+  .url("Inserisci un link OP.GG valido")
+  .max(300, "Massimo 300 caratteri")
+  .refine((value) => {
+    try {
+      const hostname = new URL(value).hostname.toLowerCase();
+      return hostname === "op.gg" || hostname.endsWith(".op.gg");
+    } catch {
+      return false;
+    }
+  }, "Inserisci un link del dominio op.gg");
 
 export const applicationSchema = z
   .object({
-    fullName: z
-      .string()
-      .trim()
-      .min(3, "Inserisci nome e cognome")
-      .max(80, "Massimo 80 caratteri"),
-    email: z
-      .string()
-      .trim()
-      .email("Inserisci un indirizzo email valido")
-      .max(120, "Massimo 120 caratteri"),
+    riotId: z.string().trim().min(1, "Inserisci il Riot ID").max(32),
+    riotTag: z.string().trim().min(1, "Inserisci il Riot Tag").max(16),
     discordUsername: z
       .string()
       .trim()
@@ -43,24 +39,14 @@ export const applicationSchema = z
         (value) => value,
         `Conferma di avere almeno ${siteConfig.minimumAge} anni`,
       ),
-
-    experience: z
-      .string()
-      .trim()
-      .min(40, "Raccontaci almeno 40 caratteri")
-      .max(1200, "Massimo 1200 caratteri"),
-    motivation: z
-      .string()
-      .trim()
-      .min(40, "Scrivi almeno 40 caratteri")
-      .max(1200, "Massimo 1200 caratteri"),
     weeklyAvailability: z
       .string()
       .trim()
-      .min(3, "Indica la disponibilita")
+      .min(1, "Indica la disponibilita")
       .max(120, "Massimo 120 caratteri"),
-    portfolioUrl: optionalUrl,
-    cvUrl: optionalUrl,
+    experience: z.string().trim().max(1024, "Massimo 1024 caratteri"),
+    motivation: z.string().trim().max(1024, "Massimo 1024 caratteri"),
+    opggUrl: opggUrl,
     privacyConsent: z
       .boolean()
       .refine((value) => value, "Il consenso privacy e obbligatorio"),

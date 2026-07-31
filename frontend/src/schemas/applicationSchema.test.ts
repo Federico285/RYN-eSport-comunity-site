@@ -2,19 +2,16 @@ import { describe, expect, it } from "vitest";
 import { applicationSchema } from "./applicationSchema";
 
 const validValues = {
-  fullName: "Mario Rossi",
-  email: "mario@example.com",
-  discordUsername: "mario#1234",
-  positionId: "community-moderator",
+  riotId: "MarioRossi",
+  riotTag: "EUW",
+  discordUsername: "mariorossi",
+  positionId: "apex-support",
   age: 21,
   confirmsMinimumAge: true,
-  experience:
-    "Ho gestito community Discord gaming per diversi mesi con turni di moderazione.",
-  motivation:
-    "Vorrei aiutare RYN a crescere con eventi ordinati e una community accogliente.",
   weeklyAvailability: "Tre sere a settimana",
-  portfolioUrl: "",
-  cvUrl: "",
+  experience: "Esperienza in team",
+  motivation: "Voglio migliorare",
+  opggUrl: "https://www.op.gg/summoners/euw/MarioRossi-EUW",
   privacyConsent: true,
   website: "",
   turnstileToken: "token",
@@ -37,10 +34,19 @@ describe("applicationSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rifiuta link facoltativi non validi", () => {
+  it("accetta esperienza e motivazione vuote", () => {
     const result = applicationSchema.safeParse({
       ...validValues,
-      portfolioUrl: "notaurl",
+      experience: "",
+      motivation: "",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rifiuta link esterni a OP.GG", () => {
+    const result = applicationSchema.safeParse({
+      ...validValues,
+      opggUrl: "https://example.com/player",
     });
     expect(result.success).toBe(false);
   });
