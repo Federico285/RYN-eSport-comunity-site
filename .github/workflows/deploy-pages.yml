@@ -35,7 +35,7 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: /RYN-eSport-comunity-site/
-          VITE_DRAFT_API_URL: https://https://ryn-application-worker.fedefalco00.workers.dev
+          VITE_DRAFT_API_URL: https://ryn-application-worker.fedefalco00.workers.dev
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
