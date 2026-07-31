@@ -29,6 +29,14 @@ describe("applicationSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("rifiuta token Turnstile troppo lunghi", () => {
+    const result = applicationSchema.safeParse({
+      ...validValues,
+      turnstileToken: "x".repeat(2049),
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("rifiuta link facoltativi non validi", () => {
     const result = applicationSchema.safeParse({
       ...validValues,

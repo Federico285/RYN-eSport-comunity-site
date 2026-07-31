@@ -10,6 +10,7 @@ declare global {
           callback: (token: string) => void;
           "expired-callback": () => void;
           "error-callback": () => void;
+          action: string;
           theme: "dark" | "light";
         },
       ) => string;
@@ -21,6 +22,7 @@ declare global {
 
 type UseTurnstileOptions = {
   siteKey: string;
+  action: string;
   onSuccess: (token: string) => void;
   onExpire: () => void;
   onError: () => void;
@@ -48,6 +50,7 @@ function loadTurnstileScript(): Promise<void> {
 
 export function useTurnstile({
   siteKey,
+  action,
   onSuccess,
   onExpire,
   onError,
@@ -77,6 +80,7 @@ export function useTurnstile({
           callback: onSuccess,
           "expired-callback": onExpire,
           "error-callback": onError,
+          action,
           theme: "dark",
         });
       })
@@ -88,7 +92,7 @@ export function useTurnstile({
         window.turnstile.remove(widgetIdRef.current);
       }
     };
-  }, [onError, onExpire, onSuccess, siteKey]);
+  }, [action, onError, onExpire, onSuccess, siteKey]);
 
   return {
     containerRef,

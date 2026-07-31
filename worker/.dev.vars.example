@@ -4,5 +4,8 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 # Secret key Cloudflare Turnstile. Usare chiavi di test solo in sviluppo.
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 
+# Hostname Turnstile consentiti, separati da virgola.
+TURNSTILE_HOSTNAMES=localhost
+
 # Origin separati da virgola. Non usare * per /apply.
 ALLOWED_ORIGINS=http://localhost:5173,https://example.com

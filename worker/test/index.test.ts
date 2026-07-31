@@ -5,6 +5,7 @@ import type { Env } from "../src/types";
 const env: Env = {
   DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/test",
   TURNSTILE_SECRET_KEY: "secret",
+  TURNSTILE_HOSTNAMES: "localhost",
   ALLOWED_ORIGINS: "http://localhost:5173",
   DRAFT_ROOMS: {} as DurableObjectNamespace,
 };
@@ -42,7 +43,11 @@ function request(body: unknown, init: RequestInit = {}) {
   });
 }
 
-function mockExternal(turnstileSuccess = true, discordSuccess = true) {
+function mockExternal(
+  turnstileSuccess = true,
+  discordSuccess = true,
+  turnstileOverrides: Record<string, unknown> = {},
+) {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: RequestInfo | URL) => {
@@ -51,6 +56,8 @@ function mockExternal(turnstileSuccess = true, discordSuccess = true) {
         return Response.json({
           success: turnstileSuccess,
           hostname: "localhost",
+          action: "application",
+          ...turnstileOverrides,
         });
       }
       return new Response(null, { status: discordSuccess ? 204 : 500 });
@@ -109,6 +116,18 @@ describe("worker /apply", () => {
 
   it("rifiuta Turnstile fallito", async () => {
     mockExternal(false);
+    const response = await handleRequest(request(validPayload), env);
+    expect(response.status).toBe(403);
+  });
+
+  it("rifiuta un token Turnstile generato per un'altra azione", async () => {
+    mockExternal(true, true, { action: "login" });
+    const response = await handleRequest(request(validPayload), env);
+    expect(response.status).toBe(403);
+  });
+
+  it("rifiuta un token Turnstile generato su un altro hostname", async () => {
+    mockExternal(true, true, { hostname: "evil.example" });
     const response = await handleRequest(request(validPayload), env);
     expect(response.status).toBe(403);
   });

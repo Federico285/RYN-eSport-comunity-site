@@ -53,6 +53,7 @@ describe("draft engine", () => {
     const env: Env = {
       DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/test",
       TURNSTILE_SECRET_KEY: "secret",
+      TURNSTILE_HOSTNAMES: "localhost",
       ALLOWED_ORIGINS: "http://localhost:5173",
       DRAFT_ROOMS: namespace,
     };

@@ -5,6 +5,7 @@
   "compatibility_date": "2026-07-28",
   "vars": {
     "ALLOWED_ORIGINS": "http://localhost:5173,https://federico285.github.io",
+    "TURNSTILE_HOSTNAMES": "federico285.github.io",
   },
   "durable_objects": {
     "bindings": [

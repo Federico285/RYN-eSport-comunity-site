@@ -65,7 +65,10 @@ export const applicationSchema = z
       .boolean()
       .refine((value) => value, "Il consenso privacy e obbligatorio"),
     website: z.string().max(0, "Richiesta non valida").optional(),
-    turnstileToken: z.string().min(1, "Completa la verifica anti-spam"),
+    turnstileToken: z
+      .string()
+      .min(1, "Completa la verifica anti-spam")
+      .max(2048, "Verifica anti-spam non valida"),
   })
   .strict();
 

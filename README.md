@@ -55,6 +55,7 @@ Copia `worker/.dev.vars.example` in `worker/.dev.vars` per sviluppo locale:
 ```env
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 TURNSTILE_SECRET_KEY=...
+TURNSTILE_HOSTNAMES=localhost
 ALLOWED_ORIGINS=http://localhost:5173,https://example.com
 ```
 
@@ -65,7 +66,7 @@ npx wrangler secret put DISCORD_WEBHOOK_URL
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
-`ALLOWED_ORIGINS` puo stare in `wrangler.jsonc` o nelle variabili ambiente Cloudflare. Usa valori separati da virgola e non usare `*` per `/apply`.
+`ALLOWED_ORIGINS` e `TURNSTILE_HOSTNAMES` possono stare in `wrangler.jsonc` o nelle variabili ambiente Cloudflare. Usa valori separati da virgola e non usare `*` per `/apply`.
 
 ## Webhook Discord
 
@@ -83,7 +84,7 @@ Il Worker invia un embed con mention neutralizzate e `allowed_mentions` vuoto.
 3. Inserisci la secret key in `TURNSTILE_SECRET_KEY` del Worker.
 4. In sviluppo puoi usare le chiavi di test Cloudflare.
 
-La verifica server-side usa Siteverify e controlla `success` e hostname quando disponibile.
+La verifica server-side usa Siteverify e richiede `success`, azione `application` e un hostname presente in `TURNSTILE_HOSTNAMES`.
 
 ## Deploy Worker
 

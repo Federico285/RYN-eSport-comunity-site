@@ -1,6 +1,7 @@
 export type Env = {
   DISCORD_WEBHOOK_URL: string;
   TURNSTILE_SECRET_KEY: string;
+  TURNSTILE_HOSTNAMES: string;
   ALLOWED_ORIGINS: string;
   DRAFT_ROOMS: DurableObjectNamespace;
   RATE_LIMITER?: {

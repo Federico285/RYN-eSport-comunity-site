@@ -64,6 +64,7 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
 
   const turnstile = useTurnstile({
     siteKey,
+    action: "application",
     onSuccess: handleTurnstileSuccess,
     onExpire: handleTurnstileReset,
     onError: handleTurnstileReset,

@@ -25,7 +25,7 @@ export const applicationSchema = z
     cvUrl: optionalUrl,
     privacyConsent: z.boolean().refine((value) => value),
     website: z.string().max(0).optional(),
-    turnstileToken: z.string().min(1).max(4096),
+    turnstileToken: z.string().min(1).max(2048),
   })
   .strict();
 
