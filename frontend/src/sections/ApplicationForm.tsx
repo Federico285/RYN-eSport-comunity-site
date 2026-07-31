@@ -343,8 +343,17 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
                 {...register("privacyConsent")}
               />
               <span>
-                Ho letto la privacy policy e acconsento all invio dei dati ai
-                responsabili della community tramite Discord.
+                Ho letto la{" "}
+                <a
+                  className="privacy-inline-link"
+                  href="#/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  privacy policy
+                </a>{" "}
+                e acconsento all&apos;invio dei dati ai contitolari e ai coach
+                autorizzati tramite il canale Discord riservato.
               </span>
             </label>
             {errors.privacyConsent ? (

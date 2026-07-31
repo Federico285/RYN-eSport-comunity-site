@@ -201,9 +201,9 @@ Copertura inclusa:
 
 ## Privacy
 
-Il form raccoglie dati minimi per valutare candidature e li inoltra ai responsabili della community tramite Discord. Prima della pubblicazione il titolare deve verificare privacy policy, tempi di conservazione, base giuridica, informative e gestione operativa dei dati.
+Il form raccoglie i dati necessari per valutare candidature amatoriali e li inoltra al canale Discord riservato ai contitolari Federico Falconi e Gabriel Peluso e ai coach autorizzati. L'informativa completa e pubblicata nella route `#/privacy` e collegata dal form e dal footer.
 
-I link `Privacy policy` e `Cookie policy` sono placeholder iniziali e vanno sostituiti con pagine reali.
+L'indirizzo `privacy@vostrodominio.it` e intenzionalmente indicato come non attivo. Quando sara disponibile il dominio ufficiale, seguire [la procedura Cloudflare Email Routing](docs/privacy-email-routing.md), sostituire l'indirizzo modello e impostare `emailReady` a `true` in `frontend/src/data/siteConfig.ts`.
 
 ## Costi previsti
 
@@ -215,7 +215,8 @@ I link `Privacy policy` e `Cookie policy` sono placeholder iniziali e vanno sost
 ## Checklist pre-produzione
 
 - [ ] Sostituire nomi team, roster, immagini e contatti in `frontend/src/data/siteConfig.ts`.
-- [ ] Creare privacy policy e cookie policy reali.
+- [x] Creare e collegare l'informativa privacy per le candidature.
+- [ ] FIXME dominio: attivare `privacy@<dominio>` con Cloudflare Email Routing e aggiornare `siteConfig.ts`.
 - [ ] Creare webhook Discord nel canale privato.
 - [ ] Configurare secret Worker con Wrangler.
 - [ ] Configurare `ALLOWED_ORIGINS` con dominio definitivo.

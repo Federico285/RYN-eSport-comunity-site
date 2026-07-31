@@ -127,4 +127,32 @@ describe("Team recruitment flow", () => {
     ).toBeInTheDocument();
     expect(window.location.hash).toBe("#/draft");
   });
+
+  it("rende disponibile l'informativa privacy senza fingere che la mail sia attiva", () => {
+    window.location.hash = "#/privacy";
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: /informativa privacy/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("privacy@vostrodominio.it")).toBeInTheDocument();
+    expect(
+      screen.getByText(/indirizzo non ancora attivo/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "privacy@vostrodominio.it" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("collega il consenso del modulo all'informativa privacy", async () => {
+    const user = userEvent.setup();
+    window.location.hash = "#/team/apex";
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /^candidati$/i }));
+
+    const privacyLink = screen.getByRole("link", { name: /privacy policy/i });
+    expect(privacyLink).toHaveAttribute("href", "#/privacy");
+    expect(privacyLink).toHaveAttribute("target", "_blank");
+  });
 });

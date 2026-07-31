@@ -135,5 +135,12 @@ export const siteConfig = {
   discordInviteUrl:
     import.meta.env.VITE_DISCORD_INVITE_URL || "https://discord.gg/placeholder",
   contactEmail: "staff@example.com",
+  // FIXME(domain): quando il dominio ufficiale sara disponibile, attivare
+  // Cloudflare Email Routing e sostituire l'indirizzo modello con privacy@<dominio>.
+  privacy: {
+    emailTemplate: "privacy@vostrodominio.it",
+    emailReady: false,
+    lastUpdated: "31 luglio 2026",
+  },
   sections: { applicationTitle: "Candidati per il roster" },
 };

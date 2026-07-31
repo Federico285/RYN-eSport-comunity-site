@@ -5,6 +5,7 @@ import { DraftCreatePage } from "./sections/DraftCreatePage";
 import { DraftRoomPage } from "./sections/DraftRoomPage";
 import { Header } from "./sections/Header";
 import { HomePage } from "./sections/HomePage";
+import { PrivacyPage } from "./sections/PrivacyPage";
 import { TeamDetail } from "./sections/TeamDetail";
 import { TeamSelection } from "./sections/TeamSelection";
 
@@ -28,6 +29,7 @@ function App() {
     [teamId],
   );
   const isTeamsPage = route === "#/teams";
+  const isPrivacyPage = route === "#/privacy";
   const isDraftCreatePage = route === "#/draft";
   const draftRoomMatch = route.match(
     /^#\/draft\/([A-Za-z0-9_-]{8,32})\/([A-Za-z0-9_-]{24,128})$/,
@@ -60,8 +62,11 @@ function App() {
     <div
       className={
         "site-shell " +
-        (!team && !isTeamsPage && !isDraftPage ? "is-home " : "") +
-        (isDraftPage ? "is-draft" : "")
+        (!team && !isTeamsPage && !isDraftPage && !isPrivacyPage
+          ? "is-home "
+          : "") +
+        (isDraftPage ? "is-draft " : "") +
+        (isPrivacyPage ? "is-privacy" : "")
       }
     >
       <Header
@@ -73,6 +78,8 @@ function App() {
         <DraftRoomPage roomId={draftRoomMatch[1]} token={draftRoomMatch[2]} />
       ) : isDraftCreatePage ? (
         <DraftCreatePage />
+      ) : isPrivacyPage ? (
+        <PrivacyPage onBack={navigateHome} />
       ) : team ? (
         <TeamDetail
           team={team}

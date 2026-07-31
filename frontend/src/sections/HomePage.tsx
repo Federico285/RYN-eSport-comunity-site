@@ -134,7 +134,10 @@ export function HomePage({ onTeams, onDraft }: HomePageProps) {
       <footer className="home-footer">
         <strong>RYN</strong>
         <span>eSport Community</span>
-        <small>(c) 2026 RYN. Placeholder legale.</small>
+        <div className="home-footer-legal">
+          <small>&copy; 2026 RYN</small>
+          <a href="#/privacy">Privacy</a>
+        </div>
       </footer>
     </main>
   );
