@@ -4,9 +4,10 @@ import {
   CheckCircle2,
   Clock3,
   Copy,
-  Download,
   Eye,
+  FileSpreadsheet,
   FileText,
+  ImageDown,
   Pause,
   Play,
   RotateCcw,
@@ -23,7 +24,13 @@ import type {
   DraftRole,
   DraftTeam,
 } from "../draft/types";
-import { buildDraftReport, buildDraftReportFilename } from "../draft/report";
+import {
+  buildDraftCsv,
+  buildDraftCsvFilename,
+  buildDraftImageFilename,
+  buildDraftReport,
+} from "../draft/report";
+import { buildDraftResultImage } from "../draft/resultImage";
 import { useDraftRoom } from "../hooks/useDraftRoom";
 import { loadChampions } from "../lib/draftApi";
 
@@ -163,6 +170,8 @@ export function DraftRoomPage({ roomId, token }: DraftRoomPageProps) {
   const [now, setNow] = useState(Date.now());
   const [resultCopied, setResultCopied] = useState(false);
   const [resultCopyError, setResultCopyError] = useState("");
+  const [resultExportError, setResultExportError] = useState("");
+  const [resultExporting, setResultExporting] = useState<"image" | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -283,18 +292,43 @@ export function DraftRoomPage({ roomId, token }: DraftRoomPageProps) {
     }
   };
 
-  const downloadDraftReport = () => {
-    const blob = new Blob([draftReport], {
-      type: "text/plain;charset=utf-8",
-    });
+  const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = buildDraftReportFilename(state);
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  const downloadDraftCsv = () => {
+    try {
+      const csv = buildDraftCsv(state, championById);
+      const blob = new Blob(["﻿", csv], {
+        type: "text/csv;charset=utf-8",
+      });
+      downloadBlob(blob, buildDraftCsvFilename(state));
+      setResultExportError("");
+    } catch {
+      setResultExportError("Non è stato possibile creare il file CSV.");
+    }
+  };
+
+  const downloadDraftImage = async () => {
+    setResultExporting("image");
+    setResultExportError("");
+    try {
+      const image = await buildDraftResultImage(state, championById);
+      downloadBlob(image, buildDraftImageFilename(state));
+    } catch {
+      setResultExportError(
+        "Non è stato possibile creare l'immagine. Riprova tra qualche secondo.",
+      );
+    } finally {
+      setResultExporting(null);
+    }
   };
 
   return (
@@ -390,14 +424,14 @@ export function DraftRoomPage({ roomId, token }: DraftRoomPageProps) {
                 <p className="draft-eyebrow">Draft completata</p>
                 <h1 id="draft-result-title">Esito pronto da condividere</h1>
                 <p>
-                  Questo riepilogo è identico per entrambi i capitani. Copialo
-                  oppure scaricalo come file di testo.
+                  Scarica la Result Card per condividerla oppure il CSV per
+                  analizzare pick, ban, lati e fasi della draft.
                 </p>
               </div>
             </div>
 
             <label className="draft-result-content">
-              <span>Contenuto del file</span>
+              <span>Riepilogo testuale da copiare</span>
               <textarea
                 aria-label="Esito completo della draft"
                 readOnly
@@ -406,13 +440,32 @@ export function DraftRoomPage({ roomId, token }: DraftRoomPageProps) {
               />
             </label>
 
-            {resultCopyError ? (
+            {resultCopyError || resultExportError ? (
               <p className="draft-result-error" role="alert">
-                {resultCopyError}
+                {resultCopyError || resultExportError}
               </p>
             ) : null}
 
             <div className="draft-result-actions">
+              <button
+                className="draft-result-image"
+                type="button"
+                onClick={downloadDraftImage}
+                disabled={resultExporting !== null}
+              >
+                <ImageDown aria-hidden="true" />
+                {resultExporting === "image"
+                  ? "Creo immagine..."
+                  : "Scarica PNG"}
+              </button>
+              <button
+                className="draft-result-download"
+                type="button"
+                onClick={downloadDraftCsv}
+              >
+                <FileSpreadsheet aria-hidden="true" />
+                Scarica CSV
+              </button>
               <button
                 className="draft-result-copy"
                 type="button"
@@ -423,15 +476,7 @@ export function DraftRoomPage({ roomId, token }: DraftRoomPageProps) {
                 ) : (
                   <Copy aria-hidden="true" />
                 )}
-                {resultCopied ? "Esito copiato" : "Copia esito"}
-              </button>
-              <button
-                className="draft-result-download"
-                type="button"
-                onClick={downloadDraftReport}
-              >
-                <Download aria-hidden="true" />
-                Scarica file .txt
+                {resultCopied ? "Riepilogo copiato" : "Copia riepilogo"}
               </button>
             </div>
           </div>

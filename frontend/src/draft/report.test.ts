@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { Champion, DraftState } from "./types";
-import { buildDraftReport, buildDraftReportFilename } from "./report";
+import {
+  buildDraftCsv,
+  buildDraftCsvFilename,
+  buildDraftImageFilename,
+  buildDraftReport,
+} from "./report";
 
 const champions: Champion[] = [
   { id: 1, slug: "Annie", name: "Annie", imageUrl: "", tags: ["Mage"] },
@@ -27,22 +32,43 @@ const state: DraftState = {
   turn: null,
 };
 
+const championById = new Map(
+  champions.map((champion) => [champion.id, champion]),
+);
+
 describe("draft report", () => {
-  it("genera un riepilogo copiabile con pick, ban e sequenza", () => {
-    const championById = new Map(
-      champions.map((champion) => [champion.id, champion]),
-    );
+  it("genera un riepilogo testuale breve delle composizioni finali", () => {
     const report = buildDraftReport(state, championById);
 
-    expect(report).toContain("TEAM BLU — Lupi d'Italia");
+    expect(report).toContain("RYN DRAFT ROOM — COMPOSIZIONI FINALI");
+    expect(report).toContain("🟦 TEAM BLU — Lupi d'Italia");
     expect(report).toContain("Pick: Olaf");
-    expect(report).toContain("Ban: Nessun ban");
-    expect(report).toContain("02. BAN · Red Foxes · Annie");
+    expect(report).toContain("Ban: Saltato");
+    expect(report).not.toContain("SEQUENZA COMPLETA");
   });
 
-  it("crea un nome file compatibile", () => {
-    expect(buildDraftReportFilename(state)).toBe(
-      "ryn-draft-lupi-d-italia-vs-red-foxes.txt",
+  it("genera un CSV analizzabile con una riga per azione", () => {
+    const csv = buildDraftCsv(state, championById);
+    const rows = csv.split("\r\n");
+
+    expect(rows).toHaveLength(4);
+    expect(rows[0]).toBe(
+      "lobby_id,blue_team,red_team,action_number,phase,action,side,team_name,champion_id,champion_name,skipped,selected_at",
+    );
+    expect(rows[1]).toContain(
+      "ABC123,Lupi d'Italia,Red Foxes,1,ban_1,ban,blue",
+    );
+    expect(rows[1]).toContain(",true,1970-01-01T00:00:00.001Z");
+    expect(rows[2]).toContain(",1,Annie,false,");
+    expect(rows[3]).toContain(",2,Olaf,false,");
+  });
+
+  it("crea nomi file coerenti per PNG e CSV", () => {
+    expect(buildDraftImageFilename(state)).toBe(
+      "ryn-draft-lupi-d-italia-vs-red-foxes.png",
+    );
+    expect(buildDraftCsvFilename(state)).toBe(
+      "ryn-draft-lupi-d-italia-vs-red-foxes.csv",
     );
   });
 });

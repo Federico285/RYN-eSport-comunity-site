@@ -4,7 +4,7 @@ function championName(
   action: DraftAction,
   championById: Map<number, Champion>,
 ) {
-  if (action.championId === null) return "Nessun ban";
+  if (action.championId === null) return "";
   return (
     championById.get(action.championId)?.name ??
     `Campione #${action.championId}`
@@ -23,39 +23,33 @@ function listTeamActions(
 ) {
   const names = state.actions
     .filter((action) => action.team === team && action.kind === kind)
-    .map((action) => championName(action, championById));
+    .map((action) =>
+      action.championId === null
+        ? "Saltato"
+        : championName(action, championById),
+    );
 
-  return names.length > 0 ? names.join(", ") : "—";
+  return names.length > 0 ? names.join(" · ") : "—";
 }
 
-export function buildDraftReport(
-  state: DraftState,
-  championById: Map<number, Champion>,
-) {
-  const sequence = state.actions.map((action, index) => {
-    const number = String(index + 1).padStart(2, "0");
-    const kind = action.kind === "pick" ? "PICK" : "BAN";
-    return `${number}. ${kind} · ${teamName(state, action.team)} · ${championName(action, championById)}`;
-  });
-
-  return [
-    "RYN DRAFT ROOM — ESITO DRAFT",
-    `Lobby: ${state.roomId}`,
-    "",
-    `TEAM BLU — ${state.blueTeam}`,
-    `Pick: ${listTeamActions(state, "blue", "pick", championById)}`,
-    `Ban: ${listTeamActions(state, "blue", "ban", championById)}`,
-    "",
-    `TEAM ROSSO — ${state.redTeam}`,
-    `Pick: ${listTeamActions(state, "red", "pick", championById)}`,
-    `Ban: ${listTeamActions(state, "red", "ban", championById)}`,
-    "",
-    "SEQUENZA COMPLETA",
-    ...sequence,
-  ].join("\n");
+function actionPhase(index: number) {
+  if (index < 6) return "ban_1";
+  if (index < 12) return "pick_1";
+  if (index < 16) return "ban_2";
+  return "pick_2";
 }
 
-export function buildDraftReportFilename(state: DraftState) {
+function spreadsheetSafe(value: string) {
+  return /^[=+\-@]/.test(value) ? `'${value}` : value;
+}
+
+function csvCell(value: string | number | boolean | null) {
+  if (value === null) return "";
+  const text = spreadsheetSafe(String(value));
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function buildDraftExportBaseName(state: DraftState) {
   const matchup = `${state.blueTeam}-vs-${state.redTeam}`
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -64,5 +58,74 @@ export function buildDraftReportFilename(state: DraftState) {
     .replace(/^-+|-+$/g, "")
     .slice(0, 70);
 
-  return `ryn-draft-${matchup || state.roomId}.txt`;
+  return `ryn-draft-${matchup || state.roomId}`;
+}
+
+export function buildDraftReport(
+  state: DraftState,
+  championById: Map<number, Champion>,
+) {
+  return [
+    "RYN DRAFT ROOM — COMPOSIZIONI FINALI",
+    `${state.blueTeam} vs ${state.redTeam}`,
+    `Lobby: ${state.roomId}`,
+    "",
+    `🟦 TEAM BLU — ${state.blueTeam}`,
+    `Pick: ${listTeamActions(state, "blue", "pick", championById)}`,
+    `Ban: ${listTeamActions(state, "blue", "ban", championById)}`,
+    "",
+    `🟥 TEAM ROSSO — ${state.redTeam}`,
+    `Pick: ${listTeamActions(state, "red", "pick", championById)}`,
+    `Ban: ${listTeamActions(state, "red", "ban", championById)}`,
+  ].join("\n");
+}
+
+export function buildDraftCsv(
+  state: DraftState,
+  championById: Map<number, Champion>,
+) {
+  const header = [
+    "lobby_id",
+    "blue_team",
+    "red_team",
+    "action_number",
+    "phase",
+    "action",
+    "side",
+    "team_name",
+    "champion_id",
+    "champion_name",
+    "skipped",
+    "selected_at",
+  ];
+
+  const rows = state.actions.map((action, index) => {
+    const skipped = action.kind === "ban" && action.championId === null;
+    return [
+      state.roomId,
+      state.blueTeam,
+      state.redTeam,
+      index + 1,
+      actionPhase(index),
+      action.kind,
+      action.team,
+      teamName(state, action.team),
+      action.championId,
+      championName(action, championById),
+      skipped,
+      new Date(action.at).toISOString(),
+    ]
+      .map(csvCell)
+      .join(",");
+  });
+
+  return [header.join(","), ...rows].join("\r\n");
+}
+
+export function buildDraftCsvFilename(state: DraftState) {
+  return `${buildDraftExportBaseName(state)}.csv`;
+}
+
+export function buildDraftImageFilename(state: DraftState) {
+  return `${buildDraftExportBaseName(state)}.png`;
 }

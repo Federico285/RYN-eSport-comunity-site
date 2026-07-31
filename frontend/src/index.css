@@ -3229,3 +3229,42 @@ textarea {
     min-height: 42px;
   }
 }
+/* Draft result exports */
+
+.draft-result-content textarea {
+  height: min(30dvh, 240px);
+  min-height: 150px;
+}
+
+.draft-result-actions {
+  grid-template-columns: 1.2fr 1fr 1fr;
+}
+
+.draft-result-image {
+  border: 0;
+  background: #22e0b8;
+  color: #06130f;
+}
+
+.draft-result-copy,
+.draft-result-download {
+  border: 1px solid #3b4958;
+  background: #111821;
+  color: #edf2f6;
+}
+
+.draft-result-actions button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+@media (max-width: 760px) {
+  .draft-result-content textarea {
+    height: 27dvh;
+    min-height: 120px;
+  }
+
+  .draft-result-actions {
+    grid-template-columns: 1fr;
+  }
+}
