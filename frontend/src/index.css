@@ -658,6 +658,23 @@ textarea:focus {
   box-shadow: 0 0 0 2px rgba(33, 230, 193, 0.22);
 }
 
+select {
+  color-scheme: dark;
+  background-color: #111827;
+}
+
+select option {
+  background: #111827;
+  color: #f7f8fa;
+}
+
+.position-locked {
+  border-color: #334155;
+  background: #0f172a;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
 textarea {
   min-height: 130px;
   resize: vertical;

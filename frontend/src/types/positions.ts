@@ -1,5 +1,6 @@
 export type OpenPosition = {
   id: string;
+  teamId: string;
   title: string;
   shortDescription: string;
   description: string;

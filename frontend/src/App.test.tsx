@@ -68,9 +68,37 @@ describe("Team recruitment flow", () => {
     expect(
       screen.getByRole("dialog", { name: /candidatura/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/posizione desiderata/i)).toHaveValue(
-      "apex-support",
+    const lockedPosition = screen.getByLabelText(/posizione desiderata/i);
+    expect(lockedPosition).toHaveValue("RYN Apex - Support");
+    expect(lockedPosition).toHaveAttribute("readonly");
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+  });
+
+  it("mostra solo le posizioni aperte del team selezionato", async () => {
+    const user = userEvent.setup();
+    window.location.hash = "#/team/nova";
+    render(<App />);
+
+    await user.click(
+      screen.getAllByRole("button", { name: /^candidati$/i })[0],
     );
+
+    const positionSelect = screen.getByRole("combobox", {
+      name: /posizione desiderata/i,
+    });
+    expect(positionSelect).toHaveValue("nova-bot");
+    expect(
+      screen.getByRole("option", { name: "RYN Nova - Bot" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "RYN Nova - Coach" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", { name: "RYN Apex - Support" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", { name: "RYN Pulse - Top" }),
+    ).not.toBeInTheDocument();
   });
 
   it("consente di passare al team successivo", async () => {

@@ -1,4 +1,4 @@
-﻿import type { OpenPosition } from "../types/positions";
+import type { OpenPosition } from "../types/positions";
 
 export type TeamRole = "top" | "jungle" | "mid" | "bot" | "support";
 
@@ -92,6 +92,7 @@ export const openPositions: OpenPosition[] = teams.flatMap((team) => [
     .filter((member) => !member.name)
     .map((member) => ({
       id: `${team.id}-${member.role}`,
+      teamId: team.id,
       title: `${team.name} - ${member.roleLabel}`,
       shortDescription: `Candidatura player ${member.roleLabel} per ${team.name}.`,
       description: `Slot ${member.roleLabel} aperto nel roster ${team.name}.`,
@@ -109,6 +110,7 @@ export const openPositions: OpenPosition[] = teams.flatMap((team) => [
     ? [
         {
           id: `${team.id}-coach`,
+          teamId: team.id,
           title: `${team.name} - Coach`,
           shortDescription: `Candidatura coach per ${team.name}.`,
           description: `Posizione coach aperta per ${team.name}.`,

@@ -16,15 +16,11 @@ type ApplicationFormProps = {
   selectedPositionId: string;
 };
 
-const availablePositions = openPositions.filter((position) => position.isOpen);
-const onlyOpenPosition =
-  availablePositions.length === 1 ? availablePositions[0] : undefined;
-
 const defaultValues: ApplicationFormValues = {
   riotId: "",
   riotTag: "",
   discordUsername: "",
-  positionId: onlyOpenPosition?.id ?? "",
+  positionId: "",
   age: siteConfig.minimumAge,
   confirmsMinimumAge: false,
   weeklyAvailability: "",
@@ -43,11 +39,22 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
   }>();
   const statusRef = useRef<HTMLDivElement | null>(null);
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
-  const selectedOpenPosition = availablePositions.find(
-    (position) => position.id === selectedPositionId,
+  const selectedOpenPosition = openPositions.find(
+    (position) => position.isOpen && position.id === selectedPositionId,
   );
-  const effectivePositionId =
-    selectedOpenPosition?.id ?? onlyOpenPosition?.id ?? "";
+  const availablePositions = selectedOpenPosition
+    ? openPositions.filter(
+        (position) =>
+          position.isOpen && position.teamId === selectedOpenPosition.teamId,
+      )
+    : [];
+  const onlyOpenPosition =
+    availablePositions.length === 1 ? availablePositions[0] : undefined;
+  const effectivePositionId = availablePositions.some(
+    (position) => position.id === selectedPositionId,
+  )
+    ? selectedPositionId
+    : (onlyOpenPosition?.id ?? "");
   const {
     register,
     handleSubmit,
@@ -190,6 +197,7 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
               >
                 <select
                   id="positionId"
+                  className="position-select"
                   aria-invalid={Boolean(errors.positionId)}
                   aria-describedby={
                     errors.positionId ? "positionId-error" : undefined
@@ -212,6 +220,8 @@ export function ApplicationForm({ selectedPositionId }: ApplicationFormProps) {
               >
                 <input
                   id="positionDisplay"
+                  className="position-locked"
+                  aria-readonly="true"
                   value={
                     onlyOpenPosition?.title ?? "Nessuna posizione disponibile"
                   }
