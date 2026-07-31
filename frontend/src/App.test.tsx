@@ -25,6 +25,9 @@ describe("Team recruitment flow", () => {
         name: /competere insieme/i,
       }),
     ).toBeInTheDocument();
+    expect(screen.getByText(/powered by/i)).toHaveTextContent(
+      "Powered by Federico Falconi",
+    );
 
     await user.click(screen.getByRole("button", { name: /scopri i team/i }));
 

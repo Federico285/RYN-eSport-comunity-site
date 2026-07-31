@@ -1349,6 +1349,17 @@ textarea {
   gap: 16px;
 }
 
+.developer-credit {
+  grid-column: 1 / -1;
+  justify-self: end;
+  letter-spacing: 0.04em;
+}
+
+.developer-credit strong {
+  color: #b8c2ce;
+  font-size: inherit;
+}
+
 .home-footer-legal a,
 .privacy-inline-link {
   color: #a9f5e7;
@@ -1714,6 +1725,10 @@ textarea {
 
   .home-footer-legal {
     grid-column: 1 / -1;
+  }
+
+  .developer-credit {
+    justify-self: start;
   }
 
   .privacy-page {

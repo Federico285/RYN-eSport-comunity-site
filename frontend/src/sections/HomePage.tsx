@@ -138,6 +138,9 @@ export function HomePage({ onTeams, onDraft }: HomePageProps) {
           <small>&copy; 2026 RYN</small>
           <a href="#/privacy">Privacy</a>
         </div>
+        <small className="developer-credit">
+          Powered by <strong>Federico Falconi</strong>
+        </small>
       </footer>
     </main>
   );
