@@ -24,7 +24,6 @@ function StaffMember({ label, member, positionId, onApply }: StaffMemberProps) {
       <div className="coach-portrait">
         <PlayerSilhouette imageUrl={member.imageUrl} name={member.name} />
       </div>
-      <RoleIcon role="coach" size={34} />
       <div className="coach-copy">
         <span>{label}</span>
         {member.name ? (

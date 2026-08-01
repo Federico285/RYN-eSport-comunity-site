@@ -625,7 +625,7 @@ button {
   display: grid;
   min-width: 0;
   height: 100%;
-  grid-template-columns: minmax(110px, 24%) 44px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(110px, 24%) minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
   padding: 8px 14px;
@@ -656,10 +656,6 @@ button {
   width: auto;
   height: 140%;
   transform: translateY(18%);
-}
-
-.staff-member > svg {
-  color: var(--accent);
 }
 
 .coach-copy h2 {
@@ -936,7 +932,7 @@ textarea {
 
   .staff-member {
     height: auto;
-    grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 6px;
   }
 
@@ -950,11 +946,6 @@ textarea {
 
   .staff-member .coach-portrait {
     display: none;
-  }
-
-  .staff-member > svg {
-    width: 24px;
-    height: 24px;
   }
 
   .coach-copy h2 {
