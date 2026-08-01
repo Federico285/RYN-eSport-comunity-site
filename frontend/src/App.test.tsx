@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
 vi.mock("./hooks/useTurnstile", () => ({
@@ -13,6 +13,10 @@ vi.mock("./hooks/useTurnstile", () => ({
 describe("Team recruitment flow", () => {
   beforeEach(() => {
     window.location.hash = "#/";
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("mostra la home e apre la selezione dei team", async () => {
@@ -41,6 +45,40 @@ describe("Team recruitment flow", () => {
       screen.getByRole("button", { name: /apri il roster ryn pulse/i }),
     ).toBeInTheDocument();
     expect(window.location.hash).toBe("#/teams");
+  });
+
+  it("ruota automaticamente le news e consente la navigazione manuale", () => {
+    vi.useFakeTimers();
+    const { unmount } = render(<App />);
+
+    expect(
+      screen.getByRole("img", {
+        name: /i giocatori ryn sollevano il trofeo/i,
+      }),
+    ).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(6500);
+    });
+
+    expect(
+      screen.getByRole("img", {
+        name: /annuncio del nuovo support di team x/i,
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Team X.*Nuovo ingresso/)).toBeInTheDocument();
+
+    act(() => {
+      screen.getByRole("button", { name: /notizia precedente/i }).click();
+    });
+
+    expect(
+      screen.getByRole("img", {
+        name: /i giocatori ryn sollevano il trofeo/i,
+      }),
+    ).toBeInTheDocument();
+
+    unmount();
   });
 
   it("naviga al dettaglio condiviso del team", async () => {

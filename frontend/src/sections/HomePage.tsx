@@ -1,4 +1,12 @@
-import { ArrowDown, ArrowRight, Trophy, Users } from "lucide-react";
+import { useEffect, useState, type FocusEvent } from "react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Trophy,
+  Users,
+} from "lucide-react";
 
 const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
@@ -7,13 +15,66 @@ type HomePageProps = {
   onDraft: () => void;
 };
 
-const achievements = [
-  { value: "1st", label: "Community Cup", season: "Spring split" },
-  { value: "18", label: "Serie vinte", season: "Ultima stagione" },
-  { value: "72%", label: "Win rate", season: "Tornei ufficiali" },
+const newsItems = [
+  {
+    id: "community-cup",
+    eyebrow: "Risultati",
+    title: "Community Cup Champions",
+    meta: "Finale nazionale · Milano",
+    image: "assets/ryn-victory.png",
+    alt: "I giocatori RYN sollevano il trofeo dopo la finale",
+    tone: "gold",
+  },
+  {
+    id: "new-support",
+    eyebrow: "Roster update",
+    title: "Benvenuto al nuovo Support",
+    meta: "Team X · Nuovo ingresso",
+    image: "assets/ryn-new-support-v1.webp",
+    alt: "Ritratto promozionale per l'annuncio del nuovo support di Team X",
+    tone: "cyan",
+  },
 ];
 
+const NEWS_ROTATION_DELAY = 6500;
+
 export function HomePage({ onTeams, onDraft }: HomePageProps) {
+  const [activeNewsIndex, setActiveNewsIndex] = useState(0);
+  const [isNewsPaused, setIsNewsPaused] = useState(false);
+  const activeNews = newsItems[activeNewsIndex];
+
+  useEffect(() => {
+    const prefersReducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (isNewsPaused || prefersReducedMotion) {
+      return undefined;
+    }
+
+    const rotation = window.setInterval(() => {
+      setActiveNewsIndex((current) => (current + 1) % newsItems.length);
+    }, NEWS_ROTATION_DELAY);
+
+    return () => window.clearInterval(rotation);
+  }, [isNewsPaused]);
+
+  const showPreviousNews = () => {
+    setActiveNewsIndex(
+      (current) => (current - 1 + newsItems.length) % newsItems.length,
+    );
+  };
+
+  const showNextNews = () => {
+    setActiveNewsIndex((current) => (current + 1) % newsItems.length);
+  };
+
+  const resumeAfterFocusLeaves = (event: FocusEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setIsNewsPaused(false);
+    }
+  };
+
   return (
     <main className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
@@ -91,37 +152,81 @@ export function HomePage({ onTeams, onDraft }: HomePageProps) {
         </div>
       </section>
 
-      <section className="wins-section" id="risultati">
+      <section
+        className="wins-section"
+        id="news"
+        aria-roledescription="carosello"
+        aria-label="News RYN"
+        onMouseEnter={() => setIsNewsPaused(true)}
+        onMouseLeave={() => setIsNewsPaused(false)}
+        onFocusCapture={() => setIsNewsPaused(true)}
+        onBlurCapture={resumeAfterFocusLeaves}
+      >
         <div className="wins-heading">
           <div>
-            <p className="home-kicker">Il percorso</p>
-            <h2>Cosa abbiamo vinto</h2>
+            <p className="home-kicker">Dalla community</p>
+            <h2>News</h2>
           </div>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risultati
-            di esempio da sostituire con tornei, date e piazzamenti reali.
+            Risultati, nuovi ingressi e aggiornamenti dai roster della community
+            RYN.
           </p>
         </div>
-        <figure className="victory-feature">
+        <figure
+          className={`victory-feature news-tone-${activeNews.tone}`}
+          key={activeNews.id}
+        >
           <img
-            src={publicAsset("assets/ryn-victory.png")}
-            alt="I giocatori RYN sollevano il trofeo dopo la finale"
+            className="news-feature-image"
+            src={publicAsset(activeNews.image)}
+            alt={activeNews.alt}
           />
           <figcaption>
-            <span>Highlight</span>
-            <strong>Community Cup Champions</strong>
-            <small>Finale nazionale - Milano</small>
+            <span>{activeNews.eyebrow}</span>
+            <strong>{activeNews.title}</strong>
+            <small>{activeNews.meta}</small>
           </figcaption>
+          <div className="news-carousel-controls">
+            <button
+              type="button"
+              aria-label="Notizia precedente"
+              onClick={showPreviousNews}
+            >
+              <ChevronLeft aria-hidden="true" size={21} />
+            </button>
+            <span aria-hidden="true">
+              {String(activeNewsIndex + 1).padStart(2, "0")} /{" "}
+              {String(newsItems.length).padStart(2, "0")}
+            </span>
+            <button
+              type="button"
+              aria-label="Notizia successiva"
+              onClick={showNextNews}
+            >
+              <ChevronRight aria-hidden="true" size={21} />
+            </button>
+          </div>
         </figure>
-        <div className="achievement-row">
-          {achievements.map((achievement) => (
-            <article key={achievement.label}>
-              <strong>{achievement.value}</strong>
+        <div
+          className="news-row"
+          role="tablist"
+          aria-label="Seleziona una notizia"
+        >
+          {newsItems.map((newsItem, index) => (
+            <button
+              className={index === activeNewsIndex ? "is-active" : undefined}
+              key={newsItem.id}
+              type="button"
+              role="tab"
+              aria-selected={index === activeNewsIndex}
+              onClick={() => setActiveNewsIndex(index)}
+            >
+              <strong>{String(index + 1).padStart(2, "0")}</strong>
               <div>
-                <h3>{achievement.label}</h3>
-                <p>{achievement.season}</p>
+                <h3>{newsItem.eyebrow}</h3>
+                <p>{newsItem.title}</p>
               </div>
-            </article>
+            </button>
           ))}
         </div>
       </section>
