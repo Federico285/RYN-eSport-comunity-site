@@ -34,11 +34,14 @@ export function HomePage({ onTeams, onDraft }: HomePageProps) {
               Scopri i team <ArrowRight aria-hidden="true" size={19} />
             </button>
             <button className="home-secondary" type="button" onClick={onDraft}>
-              Apri draft tool <ArrowDown aria-hidden="true" size={18} />
+              draft tool <ArrowRight aria-hidden="true" size={18} />
             </button>
           </div>
         </div>
-        <span className="home-scroll-marker">Scroll to discover</span>
+        <a className="home-scroll-marker" href="#chi-siamo">
+          <span>Scorri per scoprire</span>
+          <ArrowDown aria-hidden="true" size={22} />
+        </a>
       </section>
 
       <section className="about-section" id="chi-siamo">

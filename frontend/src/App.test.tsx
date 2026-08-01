@@ -66,15 +66,20 @@ describe("Team recruitment flow", () => {
     window.location.hash = "#/team/apex";
     render(<App />);
 
-    await user.click(screen.getByRole("button", { name: /^candidati$/i }));
+    await user.click(
+      screen.getAllByRole("button", { name: /^candidati$/i })[0],
+    );
 
     expect(
       screen.getByRole("dialog", { name: /candidatura/i }),
     ).toBeInTheDocument();
-    const lockedPosition = screen.getByLabelText(/posizione desiderata/i);
-    expect(lockedPosition).toHaveValue("RYN Apex - Support");
-    expect(lockedPosition).toHaveAttribute("readonly");
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    const positionSelect = screen.getByRole("combobox", {
+      name: /posizione desiderata/i,
+    });
+    expect(positionSelect).toHaveValue("apex-support");
+    expect(
+      screen.getByRole("option", { name: "RYN Apex - Assistant Coach" }),
+    ).toBeInTheDocument();
   });
 
   it("mostra solo le posizioni aperte del team selezionato", async () => {
@@ -96,6 +101,9 @@ describe("Team recruitment flow", () => {
     expect(
       screen.getByRole("option", { name: "RYN Nova - Coach" }),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", { name: "RYN Nova - Assistant Coach" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("option", { name: "RYN Apex - Support" }),
     ).not.toBeInTheDocument();
@@ -152,7 +160,9 @@ describe("Team recruitment flow", () => {
     window.location.hash = "#/team/apex";
     render(<App />);
 
-    await user.click(screen.getByRole("button", { name: /^candidati$/i }));
+    await user.click(
+      screen.getAllByRole("button", { name: /^candidati$/i })[0],
+    );
 
     const privacyLink = screen.getByRole("link", { name: /privacy policy/i });
     expect(privacyLink).toHaveAttribute("href", "#/privacy");

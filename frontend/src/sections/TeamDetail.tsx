@@ -2,7 +2,7 @@
 import type { CSSProperties } from "react";
 import { PlayerSilhouette } from "../components/PlayerSilhouette";
 import { RoleIcon } from "../components/RoleIcon";
-import type { Team } from "../data/siteConfig";
+import type { Team, TeamStaffMember } from "../data/siteConfig";
 
 type TeamDetailProps = {
   team: Team;
@@ -10,6 +10,44 @@ type TeamDetailProps = {
   onApply: (positionId: string) => void;
   onCycle: (direction: -1 | 1) => void;
 };
+
+type StaffMemberProps = {
+  label: string;
+  member: TeamStaffMember;
+  positionId: string;
+  onApply: (positionId: string) => void;
+};
+
+function StaffMember({ label, member, positionId, onApply }: StaffMemberProps) {
+  return (
+    <article className="staff-member">
+      <div className="coach-portrait">
+        <PlayerSilhouette imageUrl={member.imageUrl} name={member.name} />
+      </div>
+      <RoleIcon role="coach" size={34} />
+      <div className="coach-copy">
+        <span>{label}</span>
+        {member.name ? (
+          <h2>
+            {member.name}
+            <small>{member.tag}</small>
+          </h2>
+        ) : (
+          <h2>{member.isOpen ? "Posizione aperta" : "Posizione non attiva"}</h2>
+        )}
+      </div>
+      {member.isOpen ? (
+        <button
+          className="apply-button"
+          type="button"
+          onClick={() => onApply(positionId)}
+        >
+          Candidati
+        </button>
+      ) : null}
+    </article>
+  );
+}
 
 export function TeamDetail({
   team,
@@ -63,12 +101,30 @@ export function TeamDetail({
       <section className="roster-grid" aria-label={`Formazione ${team.name}`}>
         {team.roster.map((member) => (
           <article
-            className={`player-column ${member.name ? "is-filled" : "is-open"}`}
+            className={`player-column ${
+              member.isOpen
+                ? "is-open"
+                : member.name
+                  ? "is-filled"
+                  : "is-closed"
+            }`}
             key={member.role}
           >
             <PlayerSilhouette imageUrl={member.imageUrl} name={member.name} />
             <div className="player-meta">
-              {member.name ? (
+              {member.isOpen ? (
+                <>
+                  <p>{member.roleLabel}</p>
+                  <RoleIcon role={member.role} />
+                  <button
+                    className="apply-button"
+                    type="button"
+                    onClick={() => onApply(`${team.id}-${member.role}`)}
+                  >
+                    Candidati
+                  </button>
+                </>
+              ) : member.name ? (
                 <>
                   <h2>
                     {member.name}
@@ -81,13 +137,7 @@ export function TeamDetail({
                 <>
                   <p>{member.roleLabel}</p>
                   <RoleIcon role={member.role} />
-                  <button
-                    className="apply-button"
-                    type="button"
-                    onClick={() => onApply(`${team.id}-${member.role}`)}
-                  >
-                    Candidati
-                  </button>
+                  <span className="position-status">Non disponibile</span>
                 </>
               )}
             </div>
@@ -95,33 +145,23 @@ export function TeamDetail({
         ))}
       </section>
 
-      <section className="coach-strip" aria-label={`Coach ${team.name}`}>
-        <div className="coach-portrait">
-          <PlayerSilhouette
-            imageUrl={team.coach?.imageUrl}
-            name={team.coach?.name}
+      <section
+        className={`coach-strip ${team.assistantCoach ? "has-assistant" : ""}`}
+        aria-label={`Staff ${team.name}`}
+      >
+        <StaffMember
+          label="Coach"
+          member={team.coach}
+          positionId={`${team.id}-coach`}
+          onApply={onApply}
+        />
+        {team.assistantCoach ? (
+          <StaffMember
+            label="Assistant Coach"
+            member={team.assistantCoach}
+            positionId={`${team.id}-assistant-coach`}
+            onApply={onApply}
           />
-        </div>
-        <RoleIcon role="coach" size={34} />
-        <div className="coach-copy">
-          <span>Coach</span>
-          {team.coach?.name ? (
-            <h2>
-              {team.coach.name}
-              <small>{team.coach.tag}</small>
-            </h2>
-          ) : (
-            <h2>Posizione aperta</h2>
-          )}
-        </div>
-        {!team.coach?.name ? (
-          <button
-            className="apply-button"
-            type="button"
-            onClick={() => onApply(`${team.id}-coach`)}
-          >
-            Candidati
-          </button>
         ) : null}
       </section>
     </main>

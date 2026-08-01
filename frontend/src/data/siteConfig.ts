@@ -5,10 +5,13 @@ export type TeamRole = "top" | "jungle" | "mid" | "bot" | "support";
 export type TeamMember = {
   role: TeamRole;
   roleLabel: string;
+  isOpen: boolean;
   name?: string;
   tag?: string;
   imageUrl?: string;
 };
+
+export type TeamStaffMember = Omit<TeamMember, "role" | "roleLabel">;
 
 export type Team = {
   id: string;
@@ -18,7 +21,8 @@ export type Team = {
   accent: string;
   secondary: string;
   roster: TeamMember[];
-  coach?: Omit<TeamMember, "role" | "roleLabel">;
+  coach: TeamStaffMember;
+  assistantCoach?: TeamStaffMember;
 };
 
 const roleLabels: Record<TeamRole, string> = {
@@ -29,11 +33,10 @@ const roleLabels: Record<TeamRole, string> = {
   support: "Support",
 };
 
-const roster = (
-  members: Partial<
-    Record<TeamRole, Pick<TeamMember, "name" | "tag" | "imageUrl">>
-  >,
-): TeamMember[] =>
+type RosterMemberConfig = Pick<TeamMember, "isOpen"> &
+  Partial<Pick<TeamMember, "name" | "tag" | "imageUrl">>;
+
+const roster = (members: Record<TeamRole, RosterMemberConfig>): TeamMember[] =>
   (Object.keys(roleLabels) as TeamRole[]).map((role) => ({
     role,
     roleLabel: roleLabels[role],
@@ -49,12 +52,14 @@ export const teams: Team[] = [
     accent: "#ff4655",
     secondary: "#ffb347",
     roster: roster({
-      top: { name: "Valken", tag: "RYN" },
-      jungle: { name: "Kairo", tag: "RYN" },
-      mid: { name: "Noctis", tag: "RYN" },
-      bot: { name: "Raiden", tag: "RYN" },
+      top: { name: "Valken", tag: "RYN", isOpen: false },
+      jungle: { name: "Kairo", tag: "RYN", isOpen: false },
+      mid: { name: "Noctis", tag: "RYN", isOpen: false },
+      bot: { name: "Raiden", tag: "RYN", isOpen: false },
+      support: { isOpen: true },
     }),
-    coach: { name: "Maverick", tag: "HEAD COACH" },
+    coach: { name: "Maverick", tag: "HEAD COACH", isOpen: false },
+    assistantCoach: { isOpen: true },
   },
   {
     id: "nova",
@@ -64,11 +69,13 @@ export const teams: Team[] = [
     accent: "#22e0b8",
     secondary: "#34a8ff",
     roster: roster({
-      top: { name: "Aster", tag: "RYN" },
-      jungle: { name: "Flint", tag: "RYN" },
-      mid: { name: "Lyra", tag: "RYN" },
-      support: { name: "Echo", tag: "RYN" },
+      top: { name: "Aster", tag: "RYN", isOpen: false },
+      jungle: { name: "Flint", tag: "RYN", isOpen: false },
+      mid: { name: "Lyra", tag: "RYN", isOpen: false },
+      bot: { isOpen: true },
+      support: { name: "Echo", tag: "RYN", isOpen: false },
     }),
+    coach: { isOpen: true },
   },
   {
     id: "pulse",
@@ -78,18 +85,19 @@ export const teams: Team[] = [
     accent: "#f0d84b",
     secondary: "#ef5da8",
     roster: roster({
-      jungle: { name: "Nox", tag: "RYN" },
-      mid: { name: "Zero", tag: "RYN" },
-      bot: { name: "Flux", tag: "RYN" },
-      support: { name: "Vesper", tag: "RYN" },
+      top: { isOpen: true },
+      jungle: { name: "Nox", tag: "RYN", isOpen: false },
+      mid: { name: "Zero", tag: "RYN", isOpen: false },
+      bot: { name: "Flux", tag: "RYN", isOpen: false },
+      support: { name: "Vesper", tag: "RYN", isOpen: false },
     }),
-    coach: { name: "Iris", tag: "PERFORMANCE COACH" },
+    coach: { name: "Iris", tag: "PERFORMANCE COACH", isOpen: false },
   },
 ];
 
 export const openPositions: OpenPosition[] = teams.flatMap((team) => [
   ...team.roster
-    .filter((member) => !member.name)
+    .filter((member) => member.isOpen)
     .map((member) => ({
       id: `${team.id}-${member.role}`,
       teamId: team.id,
@@ -106,7 +114,7 @@ export const openPositions: OpenPosition[] = teams.flatMap((team) => [
       location: "Remoto",
       isOpen: true,
     })),
-  ...(!team.coach?.name
+  ...(team.coach.isOpen
     ? [
         {
           id: `${team.id}-coach`,
@@ -120,6 +128,26 @@ export const openPositions: OpenPosition[] = teams.flatMap((team) => [
             "Leadership",
           ],
           niceToHave: ["Esperienza in lega", "Metodo di VOD review"],
+          commitment: "Da definire in fase di colloquio",
+          location: "Remoto",
+          isOpen: true,
+        } satisfies OpenPosition,
+      ]
+    : []),
+  ...(team.assistantCoach?.isOpen
+    ? [
+        {
+          id: `${team.id}-assistant-coach`,
+          teamId: team.id,
+          title: `${team.name} - Assistant Coach`,
+          shortDescription: `Candidatura assistant coach per ${team.name}.`,
+          description: `Posizione assistant coach aperta per ${team.name}.`,
+          requirements: [
+            "Conoscenza del gioco competitivo",
+            "Capacita di analisi",
+            "Collaborazione con il coaching staff",
+          ],
+          niceToHave: ["Esperienza in team", "Metodo di VOD review"],
           commitment: "Da definire in fase di colloquio",
           location: "Remoto",
           isOpen: true,
