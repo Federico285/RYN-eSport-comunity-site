@@ -201,7 +201,7 @@ Copertura inclusa:
 
 ## Privacy
 
-Il form raccoglie i dati necessari per valutare candidature amatoriali e li inoltra al canale Discord riservato ai contitolari Federico Falconi e Gabriel Peluso e ai coach autorizzati. L'informativa completa e pubblicata nella route `#/privacy` e collegata dal form e dal footer.
+Il form raccoglie i dati necessari per valutare candidature amatoriali e li inoltra al canale Discord riservato ai contitolari Federico Falconi e Gabriel Omar Peluso e ai coach autorizzati. L'informativa completa e pubblicata nella route `#/privacy` e collegata dal form e dal footer.
 
 L'indirizzo `privacy@vostrodominio.it` e intenzionalmente indicato come non attivo. Quando sara disponibile il dominio ufficiale, seguire [la procedura Cloudflare Email Routing](docs/privacy-email-routing.md), sostituire l'indirizzo modello e impostare `emailReady` a `true` in `frontend/src/data/siteConfig.ts`.
 

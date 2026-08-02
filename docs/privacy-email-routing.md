@@ -31,13 +31,13 @@ Per proteggere i tuoi dati potremmo chiederti soltanto le informazioni strettame
 
 Non inviare documenti o ulteriori dati personali se non ti vengono richiesti espressamente.
 
-Federico Falconi e Gabriel Peluso
+Federico Falconi e Gabriel Omar Peluso
 Contitolari del trattamento - RYN eSport Community
 ```
 
 ## Gestione operativa
 
-- Limitare l'accesso al canale candidature a Federico, Gabriel e ai coach autorizzati del team interessato.
+- Limitare l'accesso al canale candidature a Federico Falconi, Gabriel Omar Peluso e ai coach autorizzati del team interessato.
 - Revocare immediatamente l'accesso a chi non e piu coach.
 - Vietare copia e inoltro delle candidature fuori dal canale.
 - Eliminare le candidature non selezionate entro 6 mesi dalla ricezione.

@@ -243,7 +243,9 @@ export function HomePage({ onTeams, onDraft }: HomePageProps) {
         <strong>RYN</strong>
         <span>eSport Community</span>
         <div className="home-footer-legal">
-          <small>&copy; 2026 RYN</small>
+          <small>
+            &copy; 2026 RYN — Federico Falconi e Gabriel Omar Peluso
+          </small>
           <a href="#/privacy">Privacy</a>
         </div>
         <small className="developer-credit">

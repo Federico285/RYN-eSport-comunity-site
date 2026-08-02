@@ -32,6 +32,9 @@ describe("Team recruitment flow", () => {
     expect(screen.getByText(/powered by/i)).toHaveTextContent(
       "Powered by Federico Falconi",
     );
+    expect(
+      screen.getByText(/© 2026 RYN.*Federico Falconi e Gabriel Omar Peluso/),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /scopri i team/i }));
 
@@ -188,6 +191,8 @@ describe("Team recruitment flow", () => {
     expect(
       screen.getByText(/indirizzo non ancora attivo/i),
     ).toBeInTheDocument();
+    expect(screen.getByText("Gabriel Omar Peluso")).toBeInTheDocument();
+    expect(screen.queryByText("Gabriel Peluso")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "privacy@vostrodominio.it" }),
     ).not.toBeInTheDocument();

@@ -31,7 +31,7 @@ export function PrivacyPage({ onBack }: PrivacyPageProps) {
             <strong>Accesso limitato</strong>
             <p>
               Le candidature sono consultabili soltanto da Federico Falconi,
-              Gabriel Peluso e dai coach autorizzati del team interessato.
+              Gabriel Omar Peluso e dai coach autorizzati del team interessato.
             </p>
           </div>
         </aside>
@@ -40,9 +40,9 @@ export function PrivacyPage({ onBack }: PrivacyPageProps) {
           <h2>1. Contitolari del trattamento</h2>
           <p>
             I contitolari del trattamento sono <strong>Federico Falconi</strong>{" "}
-            e <strong>Gabriel Peluso</strong>, persone fisiche che gestiscono
-            congiuntamente la community amatoriale RYN e determinano finalita e
-            modalita del trattamento delle candidature.
+            e <strong>Gabriel Omar Peluso</strong>, persone fisiche che
+            gestiscono congiuntamente la community amatoriale RYN e determinano
+            finalita e modalita del trattamento delle candidature.
           </p>
           <div className="privacy-contact-card">
             <Mail aria-hidden="true" size={21} />
